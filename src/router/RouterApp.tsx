@@ -1,12 +1,14 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Attendance from "../views/Attendance";
 import NewAttendance from "../views/NewAttendance";
+import Customer from "../views/Customer";
 
 const RouterApp = () => {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Attendance />} />
+        <Route path="/customers" element={<Customer />} />
         <Route path="/new-attendance" element={<NewAttendance />} />
       </Routes>
     </Router>
