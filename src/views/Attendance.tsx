@@ -1,6 +1,50 @@
 import React from "react";
+import api from "../utils/api";
+
+interface IAttendance {
+  attendaceId: number;
+  customerId: number;
+  employeeId: number;
+  timeIn: string;
+  timeOut: string;
+  photo: string;
+}
 
 const Attendance = () => {
+  const [data, setData] = React.useState<IAttendance[]>([
+    {
+      attendaceId: 0,
+      customerId: 0,
+      employeeId: 0,
+      timeIn: "",
+      timeOut: "",
+      photo: "",
+    },
+  ]);
+
+  const [error, setError] = React.useState<{ error: boolean; message: string }>(
+    {
+      error: false,
+      message: "",
+    }
+  );
+
+  React.useEffect(() => {
+    const requestData = async () => {
+      try {
+        const response = await api.get("/attendance/api/v1/attendance");
+        setData(response.data);
+      } catch (error) {
+        setError({
+          error: true,
+          message: "Cannot get information",
+        });
+      }
+    };
+
+    requestData();
+  }, []);
+
   return (
     <>
       <div className="sm:px-6 w-full">
@@ -13,31 +57,16 @@ const Attendance = () => {
         </div>
         <div className="bg-white py-4 md:py-7 px-4 md:px-8 xl:px-10">
           <div className="sm:flex items-center justify-between">
-            <div className="flex items-center">
-              <a
-                className="rounded-full focus:outline-none focus:ring-2  focus:bg-indigo-50 focus:ring-indigo-800"
-                href=" javascript:void(0)"
-              >
-                <div className="py-2 px-8 bg-indigo-100 text-indigo-700 rounded-full">
-                  <p>All</p>
+            <div className="flex items-center gap-4">
+              <div className="rounded-full focus:outline-none focus:ring-2  focus:bg-indigo-50 focus:ring-indigo-800">
+                <div className="py-2 px-8 bg-indigo-100  rounded-full">
+                  {error.error ? (
+                    <p className="text-red-500">{error.message}</p>
+                  ) : (
+                    <p className="text-indigo-700">All</p>
+                  )}
                 </div>
-              </a>
-              {/* <a
-                className="rounded-full focus:outline-none focus:ring-2 focus:bg-indigo-50 focus:ring-indigo-800 ml-4 sm:ml-8"
-                href="javascript:void(0)"
-              >
-                <div className="py-2 px-8 text-gray-600 hover:text-indigo-700 hover:bg-indigo-100 rounded-full ">
-                  <p>Done</p>
-                </div>
-              </a>
-              <a
-                className="rounded-full focus:outline-none focus:ring-2 focus:bg-indigo-50 focus:ring-indigo-800 ml-4 sm:ml-8"
-                href="javascript:void(0)"
-              >
-                <div className="py-2 px-8 text-gray-600 hover:text-indigo-700 hover:bg-indigo-100 rounded-full ">
-                  <p>Pending</p>
-                </div>
-              </a> */}
+              </div>
             </div>
             <button className="focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 mt-4 sm:mt-0 inline-flex items-start justify-start px-6 py-3 bg-indigo-700 hover:bg-indigo-600 focus:outline-none rounded">
               <p className="text-sm font-medium leading-none text-white">
@@ -58,176 +87,121 @@ const Attendance = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr className="focus:outline-none h-16 border border-gray-100 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-linear">
-                  <td>
-                    {/* <div className="ml-5">
-                      <div className="bg-gray-200 rounded-sm w-5 h-5 flex flex-shrink-0 justify-center items-center relative">
-                        <input
-                          placeholder="checkbox"
-                          type="checkbox"
-                          className="focus:opacity-100 checkbox opacity-0 absolute cursor-pointer w-full h-full"
-                        />
-                        <div className="check-icon hidden bg-indigo-700 text-white rounded-sm">
-                          <svg
-                            className="icon icon-tabler icon-tabler-check"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            fill="none"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          >
-                            <path stroke="none" d="M0 0h24v24H0z"></path>
-                            <path d="M5 12l5 5l10 -10"></path>
-                          </svg>
-                        </div>
+                {data.map((item: IAttendance) => (
+                  <tr
+                    key={item.attendaceId}
+                    className="focus:outline-none h-16 border border-gray-100 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-linear text-center"
+                  >
+                    <td>
+                      <p className="text-sm leading-none text-gray-600">
+                        {item.attendaceId}
+                      </p>
+                    </td>
+                    <td className="">
+                      <div className="flex items-center pl-5">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                        >
+                          <path
+                            d="M9.16667 2.5L16.6667 10C17.0911 10.4745 17.0911 11.1922 16.6667 11.6667L11.6667 16.6667C11.1922 17.0911 10.4745 17.0911 10 16.6667L2.5 9.16667V5.83333C2.5 3.99238 3.99238 2.5 5.83333 2.5H9.16667"
+                            stroke="#52525B"
+                            strokeWidth="1.25"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          ></path>
+                          <circle
+                            cx="7.50004"
+                            cy="7.49967"
+                            r="1.66667"
+                            stroke="#52525B"
+                            strokeWidth="1.25"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          ></circle>
+                        </svg>
+                        <p className="text-sm leading-none text-gray-600">
+                          {item.customerId}
+                        </p>
                       </div>
-                    </div> */}
-                    1
-                  </td>
-                  <td className="">
-                    <div className="flex items-center pl-5">1</div>
-                  </td>
-                  <td className="pl-24">
-                    <div className="flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        height="20"
-                        viewBox="0 0 20 20"
-                        fill="none"
-                      >
-                        <path
-                          d="M9.16667 2.5L16.6667 10C17.0911 10.4745 17.0911 11.1922 16.6667 11.6667L11.6667 16.6667C11.1922 17.0911 10.4745 17.0911 10 16.6667L2.5 9.16667V5.83333C2.5 3.99238 3.99238 2.5 5.83333 2.5H9.16667"
-                          stroke="#52525B"
-                          stroke-width="1.25"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        ></path>
-                        <circle
-                          cx="7.50004"
-                          cy="7.49967"
-                          r="1.66667"
-                          stroke="#52525B"
-                          stroke-width="1.25"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        ></circle>
-                      </svg>
-                      <p className="text-sm leading-none text-gray-600 ml-2">
-                        Urgent
-                      </p>
-                    </div>
-                  </td>
-                  <td className="pl-5">
-                    <div className="flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        height="20"
-                        viewBox="0 0 20 20"
-                        fill="none"
-                      >
-                        <path
-                          d="M7.5 5H16.6667"
-                          stroke="#52525B"
-                          stroke-width="1.25"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        ></path>
-                        <path
-                          d="M7.5 10H16.6667"
-                          stroke="#52525B"
-                          stroke-width="1.25"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        ></path>
-                        <path
-                          d="M7.5 15H16.6667"
-                          stroke="#52525B"
-                          stroke-width="1.25"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        ></path>
-                        <path
-                          d="M4.16669 5V5.00667"
-                          stroke="#52525B"
-                          stroke-width="1.25"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        ></path>
-                        <path
-                          d="M4.16669 10V10.0067"
-                          stroke="#52525B"
-                          stroke-width="1.25"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        ></path>
-                        <path
-                          d="M4.16669 15V15.0067"
-                          stroke="#52525B"
-                          stroke-width="1.25"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        ></path>
-                      </svg>
-                      <p className="text-sm leading-none text-gray-600 ml-2">
-                        04/07
-                      </p>
-                    </div>
-                  </td>
-                  <td className="pl-5">
-                    <div className="flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        height="20"
-                        viewBox="0 0 20 20"
-                        fill="none"
-                      >
-                        <path
-                          d="M3.33331 17.4998V6.6665C3.33331 6.00346 3.59671 5.36758 4.06555 4.89874C4.53439 4.4299 5.17027 4.1665 5.83331 4.1665H14.1666C14.8297 4.1665 15.4656 4.4299 15.9344 4.89874C16.4033 5.36758 16.6666 6.00346 16.6666 6.6665V11.6665C16.6666 12.3295 16.4033 12.9654 15.9344 13.4343C15.4656 13.9031 14.8297 14.1665 14.1666 14.1665H6.66665L3.33331 17.4998Z"
-                          stroke="#52525B"
-                          stroke-width="1.25"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        ></path>
-                        <path
-                          d="M10 9.1665V9.17484"
-                          stroke="#52525B"
-                          stroke-width="1.25"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        ></path>
-                        <path
-                          d="M6.66669 9.1665V9.17484"
-                          stroke="#52525B"
-                          stroke-width="1.25"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        ></path>
-                        <path
-                          d="M13.3333 9.1665V9.17484"
-                          stroke="#52525B"
-                          stroke-width="1.25"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        ></path>
-                      </svg>
-                      <p className="text-sm leading-none text-gray-600 ml-2">
-                        23
-                      </p>
-                    </div>
-                  </td>
-                  <td className="pl-4">
-                    <button className="focus:ring-2 focus:ring-offset-2 focus:ring-red-300 text-sm leading-none text-gray-600 py-3 px-5 bg-gray-100 rounded hover:bg-gray-200 focus:outline-none">
-                      View
-                    </button>
-                  </td>
-                </tr>
+                    </td>
+                    <td className="pl-24">
+                      <div className="flex items-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-6 h-6 text-gray-600"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                        </svg>
+
+                        <p className="text-sm leading-none text-gray-600 ml-2">
+                          {item.employeeId}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="pl-5">
+                      <div className="flex items-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-6 h-6 text-gray-600"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+
+                        <p className="text-sm leading-none text-gray-600 ml-2">
+                          {item.timeIn}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="pl-5">
+                      <div className="flex items-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-6 h-6 text-gray-600"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        <p className="text-sm leading-none text-gray-600 ml-2">
+                          {item.timeOut}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="pl-4">
+                      <button className="focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 mt-4 sm:mt-0 inline-flex items-start justify-start px-6 py-3 bg-indigo-700 hover:bg-indigo-600 focus:outline-none rounded">
+                        <p className="text-sm font-medium leading-none text-white">
+                          View
+                        </p>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
